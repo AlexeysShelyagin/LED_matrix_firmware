@@ -1,0 +1,23 @@
+#ifndef CONFING_H
+#define CONFIG_H
+
+#define MATRIX_PIN D4
+#define SA_PIN D6
+#define SB_PIN D7
+#define SW_PIN D5
+#define VOLTAGE_PIN A0
+
+#define VOLTAGE_ADJUST_FACTOR 1.0271
+#define VOLTAGE_ADJUST_OFFSET -0.1967
+
+#define DISPLAY_WIDTH 128
+#define DISPLAY_HEIGHT 64
+
+#define DISPLAY_ADDRESS 0x3C ///0x3D or 0x3C
+
+#define FONT_HEIGHT 7
+#define ROW_HEIGHT 10
+
+#define DISP_UPDATE_INTERVAL 500
+
+#endif
