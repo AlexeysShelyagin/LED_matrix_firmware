@@ -6,11 +6,15 @@
 #include "ui.h"
 #include "menu_data.h"
 #include "voltage_handler.h"
+#include "led_control.h"
+#include "values.h"
 
 Display_SSD1306 display(DISPLAY_WIDTH, DISPLAY_HEIGHT);
 Encoder encoder(SA_PIN, SB_PIN, SW_PIN);
 UI ui;
+LED_matrix matrix;
 Voltage_handler voltage(VOLTAGE_PIN, VOLTAGE_ADJUST_FACTOR, VOLTAGE_ADJUST_OFFSET);
+Values *values = new Values();
 uint64_t update_timer = 0;
 
 bool ready_to_read = true;
@@ -39,6 +43,8 @@ void setup() {
     attachInterrupt(digitalPinToInterrupt(SB_PIN), encoder_interrupt, CHANGE);
     attachInterrupt(digitalPinToInterrupt(SW_PIN), encoder_interrupt, CHANGE);
     
+    matrix.init < MATRIX_PIN > (3, 1);
+
     voltage.enable_filtering(0.1);
 
     ui.init(
@@ -63,8 +69,9 @@ void setup() {
 }
 
 void loop() {
+    matrix.update();
+
     ui.set_status_right(String(voltage.get_voltage(), 1) + "v");
-    Serial.println(analogRead(VOLTAGE_PIN));
 
     Encoder_data enc_data = encoder.get_updates();
     if(enc_data.turns != 0){

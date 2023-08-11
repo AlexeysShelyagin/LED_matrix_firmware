@@ -1,7 +1,5 @@
 #include "functions.h"
 
-Values values;
-
 template < class T >
 Spin_value < T >::Spin_value(T &value_, T step_, int x_, int y_, String name_){
     x = x_;
@@ -238,15 +236,15 @@ void Function_container::execute(int index){
 }
 
 void Function_container::func0(){
-    single_spin_template < int > ("Bright",&values.brightness, 0, 100, window -> w / 2 - 20, 1, 1);
+    single_spin_template < int > ("Bright",&(values -> brightness), 0, 255, window -> w / 2 - 20, 1, 1);
 }
 
 void Function_container::func1(){
-    single_spin_template < int > ("Temp",&values.temperature, 0, 10000, 1, 1, 0, 100);
+    single_spin_template < int > ("Temp",&(values -> temperature), 0, 10000, 1, 1, 0, 100);
 }
 
 void Function_container::func2(){
-    int *vars[3] = {&values.hue, &values.saturation, &values.visibility};
+    int *vars[3] = {&(values -> hue), &(values -> saturation), &(values -> visibility)};
     String names[3] = {"H", "S", "V"};
     int min_lims[3] = {0, 0, 0};
     int max_lims[3] = {255, 255, 255};
@@ -254,7 +252,7 @@ void Function_container::func2(){
 }
 
 void Function_container::func3(){
-    int *vars[3] = {&values.red, &values.green, &values.blue};
+    int *vars[3] = {&(values -> red), &(values -> green), &(values -> blue)};
     String names[3] = {"R", "G", "B"};
     int min_lims[3] = {0, 0, 0};
     int max_lims[3] = {255, 255, 255};
