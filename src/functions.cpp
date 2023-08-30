@@ -228,6 +228,12 @@ void Function_container::execute(int index){
     case 3:
         func3();
         break;
+    case 11:
+        func11();
+        break;
+    case 12:
+        func12();
+        break;
     default:
         Serial.println("Function with index " + String(index) + " not found");
         quit = true;
@@ -240,7 +246,9 @@ void Function_container::func0(){
 }
 
 void Function_container::func1(){
-    single_spin_template < int > ("Temp",&(values -> temperature), 0, 10000, 1, 1, 0, 100);
+    single_spin_template < int > ("Temp",&(values -> temperature), 0, 60000, 1, 1, 0, 100);
+
+    values -> current_mode = 3;
 }
 
 void Function_container::func2(){
@@ -249,6 +257,8 @@ void Function_container::func2(){
     int min_lims[3] = {0, 0, 0};
     int max_lims[3] = {255, 255, 255};
     vertical_sliders_template < int > (3, names, vars, min_lims, max_lims, 3, 40);
+
+    values -> current_mode = 1;
 }
 
 void Function_container::func3(){
@@ -257,4 +267,16 @@ void Function_container::func3(){
     int min_lims[3] = {0, 0, 0};
     int max_lims[3] = {255, 255, 255};
     vertical_sliders_template < int > (3, names, vars, min_lims, max_lims, 3, 40);
+
+    values -> current_mode = 2;
+}
+
+void Function_container::func11(){
+    values -> enabled = !(values -> enabled);
+    quit = true;
+}
+
+void Function_container::func12(){
+    values -> paused = !(values -> paused);
+    quit = true;
 }

@@ -23,4 +23,6 @@
 
 #define DISP_UPDATE_INTERVAL 500
 
+#define MIN_OPERATING_VOLTAGE 4.5
+
 #endif

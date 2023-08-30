@@ -73,6 +73,8 @@ class Function_container{
     void func1();
     void func2();
     void func3();
+    void func11();
+    void func12();
 public:
     Window* window;
     Function_event* event;

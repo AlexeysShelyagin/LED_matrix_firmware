@@ -25,6 +25,59 @@ IRAM_ATTR void encoder_interrupt(){
     encoder.tick();
 }
 
+void update_status_bar(){
+    bool need_to_disable = false;
+
+    float now_v = voltage.get_voltage();
+    if(now_v >= MIN_OPERATING_VOLTAGE){
+        ui.remove_icon_from_status(3);
+    }
+    else{
+        need_to_disable = true;
+        ui.add_icon_to_status(3);
+    }
+
+    if(!values -> enabled){
+        need_to_disable = true;
+        ui.add_icon_to_status(1);
+    }
+    else{
+        ui.remove_icon_from_status(1);
+    }
+
+    if(need_to_disable)
+        matrix.disable();
+    else
+        matrix.enable();
+
+    if(values -> paused){
+        matrix.pause();
+        ui.add_icon_to_status(0);
+    }
+    else{
+        matrix.unpause();
+        ui.remove_icon_from_status(0);
+    }
+
+    ui.set_status_right(String(now_v, 1) + "v");
+
+    String status = "";
+    switch (values -> current_mode){
+        case 1:
+            status = "HSV";
+            break;
+        case 2:
+            status = "RGB";
+            break;
+        case 3:
+            status = "temp";
+            break;
+        default:
+            break;
+    }
+    ui.set_status(status);
+}
+
 void setup() {
     pinMode(MATRIX_PIN, OUTPUT);
 
@@ -43,7 +96,7 @@ void setup() {
     attachInterrupt(digitalPinToInterrupt(SB_PIN), encoder_interrupt, CHANGE);
     attachInterrupt(digitalPinToInterrupt(SW_PIN), encoder_interrupt, CHANGE);
     
-    matrix.init < MATRIX_PIN > (3, 1);
+    matrix.init < MATRIX_PIN > (16, 16);
 
     voltage.enable_filtering(0.1);
 
@@ -56,22 +109,17 @@ void setup() {
     //ui.current_menu = ui.default_menu -> items[2].link_menu;
     ui.current_menu = ui.default_menu;
 
-    ui.set_status("RGB");
-
     ui.add_icon_bitmap(bitmap_pause, 6, 8);
     ui.add_icon_bitmap(bitmap_stop, 6, 8);
     ui.add_icon_bitmap(bitmap_wifi, 8, 8);
-    ui.add_icon_to_status(0);
-    ui.add_icon_to_status(1);
-    ui.add_icon_to_status(2);
+    ui.add_icon_bitmap(bitmap_battery, 8, 8);
 
     Serial.println("initialized");
 }
 
 void loop() {
+    update_status_bar();
     matrix.update();
-
-    ui.set_status_right(String(voltage.get_voltage(), 1) + "v");
 
     Encoder_data enc_data = encoder.get_updates();
     if(enc_data.turns != 0){
