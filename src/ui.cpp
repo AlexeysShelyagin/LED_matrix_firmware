@@ -115,16 +115,16 @@ void UI::render_menu(Menu* menu){
 
         switch (menu -> items[i_absolute].type){
         case MENU:
-            menu_window.draw_bitmap(118, menu_window.row_h * i + 1, bitmap_folder, 8, 8);
+            menu_window.draw_bitmap(max(menu_window.w - 10, MIN_ICON_X), menu_window.row_h * i + 1, bitmap_folder, 8, 8);
             break;
         case FUNC:
-            menu_window.draw_bitmap(118, menu_window.row_h * i + 1, bitmap_control, 8, 8);
+            menu_window.draw_bitmap(max(menu_window.w - 10, MIN_ICON_X), menu_window.row_h * i + 1, bitmap_control, 8, 8);
             break;
         case BACK:
-            menu_window.draw_bitmap(118, menu_window.row_h * i + 1, bitmap_back, 8, 8);
+            menu_window.draw_bitmap(max(menu_window.w - 10, MIN_ICON_X), menu_window.row_h * i + 1, bitmap_back, 8, 8);
             break;
         case PARAM:
-            menu_window.draw_bitmap(118, menu_window.row_h * i + 1, bitmap_gear, 8, 8);
+            menu_window.draw_bitmap(max(menu_window.w - 10, MIN_ICON_X), menu_window.row_h * i + 1, bitmap_gear, 8, 8);
             break;
         default: break;
         };

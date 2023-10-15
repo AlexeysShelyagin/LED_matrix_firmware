@@ -20,6 +20,7 @@
 
 #define FONT_HEIGHT 7
 #define ROW_HEIGHT 10
+#define MIN_ICON_X 100
 
 #define DISP_UPDATE_INTERVAL 500
 

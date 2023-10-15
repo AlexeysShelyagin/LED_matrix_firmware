@@ -104,7 +104,7 @@ void setup() {
         load_menu(menu::menu_list, menu::menu_sizes, menu::menu_linking, menu::menu_types, menu::menu_n),
         &display, FONT_HEIGHT, ROW_HEIGHT, true
     );
-    //ui.tree();
+    ui.tree();
 
     //ui.current_menu = ui.default_menu -> items[2].link_menu;
     ui.current_menu = ui.default_menu;
@@ -115,6 +115,12 @@ void setup() {
     ui.add_icon_bitmap(bitmap_battery, 8, 8);
 
     Serial.println("initialized");
+
+    Color_container::RGB_color tmp_col;
+    tmp_col.r = 200;
+    tmp_col.b = 122;
+    
+    values -> color_container.set_to_id('B', tmp_col);
 }
 
 void loop() {

@@ -60,6 +60,10 @@ public:
 class Function_container{
     uint64_t last_call = 0;
     uint8_t selected = 0;
+    uint8_t scroll = 0;
+
+    Function_container *page = nullptr;
+    uint8_t page_index;
 
     bool element_active = false;
 
@@ -75,6 +79,9 @@ class Function_container{
     void func3();
     void func11();
     void func12();
+    void func13();
+
+    void page0();
 public:
     Window* window;
     Function_event* event;
@@ -84,6 +91,8 @@ public:
     Function_container() = default;
 
     void execute(int index);
+
+    void execute_page(int index);
 };
 
 #endif

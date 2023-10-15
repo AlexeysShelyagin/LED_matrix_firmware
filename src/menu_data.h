@@ -22,7 +22,7 @@ namespace menu{
         "Static",
         "Dynamic",
 
-        "Interface",
+        "Memory",
         "Current limit",
         "Max brightness",
         "Color calibration",
@@ -33,20 +33,23 @@ namespace menu{
         "Color HSV",
         "Color RGB",
 
-        "Strobe",
+        "One-color strobe",
+        "Multi-color strobe",
+        "Fade strobe",
 
-        "Scale"
+        "Timings",
+        "Colors"
     };
 
-    static uint8_t menu_sizes[] = {5, 2, 5, 4, 1, 1};
+    static uint8_t menu_sizes[] = {5, 2, 5, 4, 3, 2};
 
     static uint8_t menu_linking[] = {
         1, 11, 12, 2, 9,
         3, 4,
         5, 4, 5, 6, 7,
         0, 1, 2, 3,
-        10,
-        8
+        10, 14, 15,
+        8, 13
     };
 
     static uint8_t menu_types[] = {
@@ -54,8 +57,8 @@ namespace menu{
         MENU, MENU,
         MENU, PARAM, PARAM, PARAM, PARAM,
         FUNC, FUNC, FUNC, FUNC,
-        FUNC,
-        PARAM
+        FUNC, FUNC, FUNC,
+        FUNC, FUNC
     };
 
 }
@@ -73,8 +76,9 @@ root:                               MENU_0
     ON/OFF:                             FUNC_11
     Run/Stop:                           FUNC_12
     Settings:                       MENU_2
-        Interface:                  MENU_5
-            Scale                       FUNC_8
+        Memory:                     MENU_5
+            Timings                     FUNC_8
+            Colors                      FUNC_13
         Current limit:                  FUNC_4
         Max brightness:                 FUNC_5
         Color calibration:              FUNC_6

@@ -36,6 +36,10 @@ CRGB temp_to_rgb(int temp_in_kelvin){
         blue = 255;
     }
 
+    green *= 1.12;
+    //blue *= 0.75;
+    blue *= 0.0125 * temp;
+
     return CRGB(
         clamp(red, 0, 255),
         clamp(green, 0, 255),
@@ -72,7 +76,6 @@ void LED_matrix::update(){
         for(int i = 0; i < w * h; i++)
             leds[i] = temp_to_rgb(values -> temperature);
     }
-
 
     FastLED.show();
 }
