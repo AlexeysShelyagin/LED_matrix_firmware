@@ -214,6 +214,25 @@ void Function_container::single_spin_template(String name, T* variable, T min_li
         
 }
 
+void Function_container::list_spin_template(String list[], int options_n, String name, int x, int y){
+    if(event -> selected)
+        quit = true;
+
+    if(event -> moved){
+        selected += event -> moved;
+        selected %= options_n;
+    }
+
+    String bracket_left = ":< ", bracket_right = " >";
+    bool animate_state = ((millis() / BLINK_TIMEOUT) % 2 == 0);
+    if(animate_state){
+        bracket_left = ":  ";
+        bracket_right = "  ";
+    }
+
+    window -> print(name + bracket_left + list[selected] + bracket_right, x, y);
+}
+
 void Function_container::execute(int index){
     switch (index){
     case 0:
@@ -228,6 +247,9 @@ void Function_container::execute(int index){
     case 3:
         func3();
         break;
+    case 7:
+        func7();
+        break;
     case 11:
         func11();
         break;
@@ -236,6 +258,9 @@ void Function_container::execute(int index){
         break;
     case 13:
         func13();
+        break;
+    case 16:
+        func16();
         break;
     default:
         Serial.println("Function with index " + String(index) + " not found");
@@ -270,64 +295,7 @@ void Function_container::HSV_template(int16_t *vars[3]){
     vertical_sliders_template < int16_t > (3, names, vars, min_lims, max_lims, 3, 40);
 }
 
-void Function_container::func0(){
-    single_spin_template < int > ("Bright",&(values -> brightness), 0, 255, window -> w / 2 - 20, 1, 1);
-}
-
-void Function_container::func1(){
-    single_spin_template < int > ("Temp",&(values -> temperature), 0, 60000, 1, 1, 0, 100);
-
-    values -> current_mode = 3;
-}
-
-void Function_container::func2(){
-    int16_t *vars[3] = {&(values -> hue), &(values -> saturation), &(values -> visibility)};
-    HSV_template(vars);
-
-    values -> current_mode = 1;
-}
-
-void Function_container::func3(){
-    int16_t *vars[3] = {&(values -> red), &(values -> green), &(values -> blue)};
-    RGB_template(vars);
-
-    values -> current_mode = 2;
-}
-
-void Function_container::func11(){
-    values -> enabled = !(values -> enabled);
-    quit = true;
-}
-
-void Function_container::func12(){
-    values -> paused = !(values -> paused);
-    quit = true;
-}
-
-void Function_container::func13(){
-    if(page != nullptr){
-        window -> clear();
-        page -> execute_page(page_index);
-
-        if(page -> quit){
-            delete page;
-            page = nullptr;
-        }
-        return;
-    }
-
-    if(event -> selected){
-        if(selected == 26)
-            quit = true;
-        else{
-            values -> current_color_id = selected + 'A';
-            page = new Function_container();
-            page -> window = window;
-            page -> event = event;
-            page_index = 0;
-        }
-    }
-
+void Function_container::color_ids_template(){
     if(event -> moved){
         int select_tmp = selected + event -> moved;
         if(select_tmp < 0)
@@ -372,6 +340,107 @@ void Function_container::func13(){
     }
 }
 
+void Function_container::func0(){
+    single_spin_template < int > ("Bright",&(values -> brightness), 0, 255, window -> w / 2 - 20, 1, 1);
+}
+
+void Function_container::func1(){
+    single_spin_template < int > ("Temp",&(values -> temperature), 0, 60000, 1, 1, 0, 100);
+
+    values -> current_mode = 3;
+}
+
+void Function_container::func2(){
+    int16_t *vars[3] = {&(values -> hue), &(values -> saturation), &(values -> visibility)};
+    HSV_template(vars);
+
+    values -> current_mode = 1;
+}
+
+void Function_container::func3(){
+    int16_t *vars[3] = {&(values -> red), &(values -> green), &(values -> blue)};
+    RGB_template(vars);
+
+    values -> current_mode = 2;
+}
+
+void Function_container::func7(){
+    selected = (values -> color_memory_preview) ? 1 : 0;
+    String states[] = {"OFF", "ON"};
+    list_spin_template(states, 2);
+
+    values -> color_memory_preview = (selected == 0) ? false : true;
+}
+
+void Function_container::func11(){
+    values -> enabled = !(values -> enabled);
+    quit = true;
+}
+
+void Function_container::func12(){
+    values -> paused = !(values -> paused);
+    quit = true;
+}
+
+void Function_container::func13(){
+    if(page != nullptr){
+        window -> clear();
+        page -> execute_page(page_index);
+
+        if(page -> quit){
+            delete page;
+            page = nullptr;
+
+            values -> color_container.save(values -> current_color_id);
+        }
+        return;
+    }
+
+    if(event -> selected){
+        if(selected != 26){
+            values -> current_color_id = selected + 'A';
+            page = new Function_container();
+            page -> window = window;
+            page -> event = event;
+            page_index = 0;
+        }
+        else{
+            values -> color_container.commit();
+            quit = true;
+        }
+    }
+
+    color_ids_template();
+}
+
+void Function_container::func16(){
+    if(event -> selected){
+        if(selected != 26){
+            char id = selected + 'A';
+            if(values -> color_container.type(id)){
+                Color_container::HSV_color col = values -> color_container.get_hsv_by_id(id);
+                values -> hue = col.h;
+                values -> saturation = col.s;
+                values -> visibility = col.v;
+
+                values -> current_mode = 1;
+            }
+            else{
+                Color_container::RGB_color col = values -> color_container.get_rgb_by_id(id);
+                values -> red = col.r;
+                values -> green = col.g;
+                values -> blue = col.b;
+
+                values -> current_mode = 2;
+            }
+        }
+        else
+            quit = true;
+    }
+
+    color_ids_template();
+}
+
 void Function_container::page0(){
     if(page_index == 1){
         Color_container::RGB_color col = values -> color_container.get_rgb_by_id(values -> current_color_id);
@@ -379,6 +448,14 @@ void Function_container::page0(){
         RGB_template(vars);
         
         values -> color_container.set_to_id(values -> current_color_id, col);
+
+        if(values -> color_memory_preview){
+            values -> red = col.r;
+            values -> green = col.g;
+            values -> blue = col.b;
+
+            values -> current_mode = 2;
+        }
         return;
     }
     if(page_index == 2){
@@ -387,30 +464,45 @@ void Function_container::page0(){
         HSV_template(vars);
         
         values -> color_container.set_to_id(values -> current_color_id, col);
+
+        if(values -> color_memory_preview){
+            values -> hue = col.h;
+            values -> saturation = col.s;
+            values -> visibility = col.v;
+
+            values -> current_mode = 1;
+        }
         return;
+    }
+    if(page_index == 3){
+        values -> color_container.del(values -> current_color_id);
+        quit = true;
     }
 
     if(event -> selected){
-        if(selected == 2)
+        if(selected == 3)
             quit = true;
         else
             page_index = selected + 1;
     }
 
     if(event -> moved)
-        selected = min(max(selected + event -> moved, 0), 2);
+        selected = min(max(selected + event -> moved, 0), 3);
 
     int x = window -> w / 2, y = window -> h / 2 - window -> row_h / 2;
     int underline_y = window -> h / 2 + window -> row_h / 2;
 
     window -> print_right("RGB", x - 12, y);
     window -> print("HSV", x + 12, y);
+    window -> print("Delete", x - 18, y + window -> row_h * 2);
 
     if(selected == 0)
         window -> draw_line(x - 32, underline_y, x - 12, underline_y);
     if(selected == 1)
         window -> draw_line(x + 30, underline_y, x + 10, underline_y);
-    if(selected == 2){
+    if(selected == 2)
+        window -> draw_line(x - 20, underline_y + window -> row_h * 2, x + 18, underline_y + window -> row_h * 2);
+    if(selected == 3){
         Back_button back(window -> w / 2 - BACK_BUTTON_WIDTH / 2 , window -> h / 2 - BACK_BUTTON_HEIGHT / 2);
         back.render(window);
     }

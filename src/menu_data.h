@@ -26,12 +26,13 @@ namespace menu{
         "Current limit",
         "Max brightness",
         "Color calibration",
-        "About",
+        "Preview color ID",
 
         "Brightness",
         "Temperature",
         "Color HSV",
         "Color RGB",
+        "Color by ID",
 
         "One-color strobe",
         "Multi-color strobe",
@@ -41,13 +42,13 @@ namespace menu{
         "Colors"
     };
 
-    static uint8_t menu_sizes[] = {5, 2, 5, 4, 3, 2};
+    static uint8_t menu_sizes[] = {5, 2, 5, 5, 3, 2};
 
     static uint8_t menu_linking[] = {
         1, 11, 12, 2, 9,
         3, 4,
         5, 4, 5, 6, 7,
-        0, 1, 2, 3,
+        0, 1, 2, 3, 16,
         10, 14, 15,
         8, 13
     };
@@ -56,7 +57,7 @@ namespace menu{
         MENU, FUNC, FUNC, MENU, FUNC,
         MENU, MENU,
         MENU, PARAM, PARAM, PARAM, PARAM,
-        FUNC, FUNC, FUNC, FUNC,
+        FUNC, FUNC, FUNC, FUNC, FUNC,
         FUNC, FUNC, FUNC,
         FUNC, FUNC
     };

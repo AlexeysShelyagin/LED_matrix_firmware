@@ -26,4 +26,10 @@
 
 #define MIN_OPERATING_VOLTAGE 4.5
 
+#define COLOR_ID_N 26
+#define COLOR_DEFINED_MASK_ADDR 0
+#define COLOR_TYPE_MASK_ADDR 4
+#define COLOR_FIRST_VAL_ADDR 8
+#define EEPROM_SIZE 164                 //COLOR_ID_N * 6 + 8
+
 #endif

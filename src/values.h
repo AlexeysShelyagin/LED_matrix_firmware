@@ -17,6 +17,7 @@ public:
 
     Color_container color_container;
     char current_color_id;
+    bool color_memory_preview = false;
 
     Values() = default;
 };

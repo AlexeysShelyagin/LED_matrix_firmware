@@ -36,12 +36,54 @@ Color_container::RGB_color Color_container::HSV_to_RGB(HSV_color color){
     return res;
 }
 
-void Color_container::load(char id){
+void Color_container::load_init(){
+    EEPROM.get(COLOR_DEFINED_MASK_ADDR, defined_mask);
+    EEPROM.get(COLOR_TYPE_MASK_ADDR, type_mask);
 
+    for(uint8_t i = 0; i < 26; i++){
+        if(defined_mask & ((uint32_t) 1 << i)){
+            if(type_mask & ((uint32_t) 1 << i))
+                EEPROM.get(COLOR_FIRST_VAL_ADDR + 6 * i, container_hsv[i]);
+            else
+                EEPROM.get(COLOR_FIRST_VAL_ADDR + 6 * i, container_rgb[i]);
+        }
+    }
 }
 
-void Color_container::save(char id){
+void Color_container::load(char id){
+    if(defined(id)){
+        uint8_t i = id - 'A';
+        if(type_mask & ((uint32_t) 1 << i))
+            EEPROM.get(COLOR_FIRST_VAL_ADDR + 6 * i, container_hsv[i]);
+        else
+            EEPROM.get(COLOR_FIRST_VAL_ADDR + 6 * i, container_rgb[i]);
+    }
+}
 
+void Color_container::save(char id, bool commit){
+    EEPROM.put(COLOR_DEFINED_MASK_ADDR, defined_mask);
+    EEPROM.put(COLOR_TYPE_MASK_ADDR, type_mask);
+
+    uint8_t i = id - 'A';
+    if(type(id))
+        EEPROM.put(COLOR_FIRST_VAL_ADDR + 6 * i, container_hsv[i]);
+    else
+        EEPROM.put(COLOR_FIRST_VAL_ADDR + 6 * i, container_rgb[i]);
+    
+    if(commit)
+        EEPROM.commit();
+}
+
+void Color_container::del(char id){
+    if(!valid(id))
+        return;
+    uint8_t i = id - 'A';
+    
+    defined_mask &= ~((uint32_t) 1 << i);
+}
+
+void Color_container::commit(){
+    EEPROM.commit();
 }
 
 Color_container::RGB_color Color_container::get_rgb_by_id(char id){

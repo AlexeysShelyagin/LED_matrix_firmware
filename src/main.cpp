@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <EEPROM.h>
 
 #include "config.h"
 #include "display.h"
@@ -114,13 +115,10 @@ void setup() {
     ui.add_icon_bitmap(bitmap_wifi, 8, 8);
     ui.add_icon_bitmap(bitmap_battery, 8, 8);
 
-    Serial.println("initialized");
+    EEPROM.begin(EEPROM_SIZE);
+    values -> color_container.load_init();
 
-    Color_container::RGB_color tmp_col;
-    tmp_col.r = 200;
-    tmp_col.b = 122;
-    
-    values -> color_container.set_to_id('B', tmp_col);
+    Serial.println("initialized");
 }
 
 void loop() {

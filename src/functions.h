@@ -33,7 +33,7 @@ public:
     bool active = false;
 
     Spin_value() = default;
-    Spin_value(T &value_, T step_, int x_, int y_, String name_ = "");
+    Spin_value(T &value_, T step_, int x_ = 0, int y_ = 0, String name_ = "");
 
     void set_size(int w_, int h_);
     void set_limits(T min, T max);
@@ -73,16 +73,22 @@ class Function_container{
     template < class T >
     void single_spin_template(String name, T* variable, T min_lim, T max_lim, int st_x, int st_y, uint8_t type = 0, T fixed_step = 0);
 
+    void list_spin_template(String list[], int options_n, String name = "", int x = 0, int y = 0);
+
     void RGB_template(int16_t *vars[3]);
     void HSV_template(int16_t *vars[3]);
+
+    void color_ids_template();
 
     void func0();
     void func1();
     void func2();
     void func3();
+    void func7();
     void func11();
     void func12();
     void func13();
+    void func16();
 
     void page0();
 public:

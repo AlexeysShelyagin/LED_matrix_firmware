@@ -2,6 +2,9 @@
 #define COLOR_CONTAINER_H
 
 #include <Arduino.h>
+#include <EEPROM.h>
+
+#include "config.h"
 
 class Color_container{
 public:
@@ -25,8 +28,11 @@ private:
 public:
     Color_container() = default;
 
+    void load_init();
     void load(char id = 0);
-    void save(char id = 0);
+    void save(char id = 0, bool commit = false);
+    void del(char id = 0);
+    void commit();
 
     RGB_color get_rgb_by_id(char id);
     HSV_color get_hsv_by_id(char id);
