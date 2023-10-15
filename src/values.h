@@ -12,10 +12,11 @@ public:
     uint8_t current_mode = 0;
 
     int temperature = 4000;
-    int hue = 0, saturation = 150, visibility = 255;
-    int red = 0, green = 0, blue = 0;
+    int16_t hue = 0, saturation = 150, visibility = 255;
+    int16_t red = 0, green = 0, blue = 0;
 
     Color_container color_container;
+    char current_color_id;
 
     Values() = default;
 };

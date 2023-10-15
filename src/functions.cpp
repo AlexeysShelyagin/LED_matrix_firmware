@@ -23,7 +23,7 @@ void Spin_value < T >::set_limits(T min, T max){
 }
 
 template < class T >
-void Spin_value < T >::change(int n){
+void Spin_value < T >::change(T n){
     if(!active) return;
 
     if(!limited){
@@ -31,8 +31,8 @@ void Spin_value < T >::change(int n){
         return;
     }
 
-    if(n > 0) *value = min(*value + n * step, limit_max);
-    else *value = max(*value + n * step, limit_min);
+    if(n > 0) *value = min(static_cast < T > (*value + n * step), limit_max);
+    else *value = max(static_cast < T > (*value + n * step), limit_min);
 }
 
 template < class T >
@@ -140,7 +140,7 @@ void Function_container::vertical_sliders_template(uint8_t n, String name_list[]
 
     Spin_value < T > *value_list[n];
     for(uint8_t i = 0; i < n; i++){
-        int step = ceil((max_lims[i] - min_lims[i]) * SPIN_SPEED_FACTOR / timeout);
+        T step = ceil((max_lims[i] - min_lims[i]) * SPIN_SPEED_FACTOR / timeout);
 
         value_list[i] = new Spin_value(*variables[i], step, st_x + offset_x * i, window -> row_h, name_list[i]);
         value_list[i] -> set_size(offset_x, window -> h - 3 - window -> row_h);
@@ -256,6 +256,20 @@ void Function_container::execute_page(int index){
     }
 } 
 
+void Function_container::RGB_template(int16_t *vars[3]){
+    String names[3] = {"R", "G", "B"};
+    int16_t min_lims[3] = {0, 0, 0};
+    int16_t max_lims[3] = {255, 255, 255};
+    vertical_sliders_template < int16_t > (3, names, vars, min_lims, max_lims, 3, 40);
+}
+
+void Function_container::HSV_template(int16_t *vars[3]){
+    String names[3] = {"H", "S", "V"};
+    int16_t min_lims[3] = {0, 0, 0};
+    int16_t max_lims[3] = {255, 255, 255};
+    vertical_sliders_template < int16_t > (3, names, vars, min_lims, max_lims, 3, 40);
+}
+
 void Function_container::func0(){
     single_spin_template < int > ("Bright",&(values -> brightness), 0, 255, window -> w / 2 - 20, 1, 1);
 }
@@ -267,21 +281,15 @@ void Function_container::func1(){
 }
 
 void Function_container::func2(){
-    int *vars[3] = {&(values -> hue), &(values -> saturation), &(values -> visibility)};
-    String names[3] = {"H", "S", "V"};
-    int min_lims[3] = {0, 0, 0};
-    int max_lims[3] = {255, 255, 255};
-    vertical_sliders_template < int > (3, names, vars, min_lims, max_lims, 3, 40);
+    int16_t *vars[3] = {&(values -> hue), &(values -> saturation), &(values -> visibility)};
+    HSV_template(vars);
 
     values -> current_mode = 1;
 }
 
 void Function_container::func3(){
-    int *vars[3] = {&(values -> red), &(values -> green), &(values -> blue)};
-    String names[3] = {"R", "G", "B"};
-    int min_lims[3] = {0, 0, 0};
-    int max_lims[3] = {255, 255, 255};
-    vertical_sliders_template < int > (3, names, vars, min_lims, max_lims, 3, 40);
+    int16_t *vars[3] = {&(values -> red), &(values -> green), &(values -> blue)};
+    RGB_template(vars);
 
     values -> current_mode = 2;
 }
@@ -312,6 +320,7 @@ void Function_container::func13(){
         if(selected == 26)
             quit = true;
         else{
+            values -> current_color_id = selected + 'A';
             page = new Function_container();
             page -> window = window;
             page -> event = event;
@@ -348,9 +357,14 @@ void Function_container::func13(){
         else{
             char color_id = i + scroll + 'A';
             if(values -> color_container.defined(color_id)){
-                Color_container::RGB_color col = values -> color_container.get_by_id(color_id);
-
-                window -> print(String(color_id) + " RGB(" + String(col.r) + ", " + String(col.g) + ", " + String(col.b) + ")", 1 + x_offset, y);
+                if(values -> color_container.type(color_id)){
+                    Color_container::HSV_color col = values -> color_container.get_hsv_by_id(color_id);
+                    window -> print(String(color_id) + " HSV(" + String(col.h) + ", " + String(col.s) + ", " + String(col.v) + ")", 1 + x_offset, y);
+                }
+                else{
+                    Color_container::RGB_color col = values -> color_container.get_rgb_by_id(color_id);
+                    window -> print(String(color_id) + " RGB(" + String(col.r) + ", " + String(col.g) + ", " + String(col.b) + ")", 1 + x_offset, y);
+                }
             }
             else
                 window -> print(String(color_id) + " -", 1 + x_offset, y);
@@ -359,9 +373,28 @@ void Function_container::func13(){
 }
 
 void Function_container::page0(){
+    if(page_index == 1){
+        Color_container::RGB_color col = values -> color_container.get_rgb_by_id(values -> current_color_id);
+        int16_t *vars[3] = {&col.r, &col.g, &col.b};
+        RGB_template(vars);
+        
+        values -> color_container.set_to_id(values -> current_color_id, col);
+        return;
+    }
+    if(page_index == 2){
+        Color_container::HSV_color col = values -> color_container.get_hsv_by_id(values -> current_color_id);
+        int16_t *vars[3] = {&col.h, &col.s, &col.v};
+        HSV_template(vars);
+        
+        values -> color_container.set_to_id(values -> current_color_id, col);
+        return;
+    }
+
     if(event -> selected){
         if(selected == 2)
             quit = true;
+        else
+            page_index = selected + 1;
     }
 
     if(event -> moved)

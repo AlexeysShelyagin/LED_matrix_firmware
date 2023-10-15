@@ -37,7 +37,7 @@ public:
 
     void set_size(int w_, int h_);
     void set_limits(T min, T max);
-    void change(int n);
+    void change(T n);
 
     void render(Window *window);
     void render_hor_slider(Window *window, bool show_value = true);
@@ -63,7 +63,7 @@ class Function_container{
     uint8_t scroll = 0;
 
     Function_container *page = nullptr;
-    uint8_t page_index;
+    uint8_t page_index = 0;
 
     bool element_active = false;
 
@@ -72,6 +72,9 @@ class Function_container{
     
     template < class T >
     void single_spin_template(String name, T* variable, T min_lim, T max_lim, int st_x, int st_y, uint8_t type = 0, T fixed_step = 0);
+
+    void RGB_template(int16_t *vars[3]);
+    void HSV_template(int16_t *vars[3]);
 
     void func0();
     void func1();
@@ -91,7 +94,6 @@ public:
     Function_container() = default;
 
     void execute(int index);
-
     void execute_page(int index);
 };
 
