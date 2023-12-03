@@ -77,6 +77,12 @@ void LED_matrix::update(){
             leds[i] = temp_to_rgb(values -> temperature);
     }
 
+    Serial.println(0);      // for some f*ck matrix can't update without this line, it updates only while changing menu and not real-time
+    // by the way it needs to print a number, letter doesn't help
+    // in the previous commit there wasn't such a problem
+    // I have no idea why is this happening
+    // TODO: fix that
+
     FastLED.show();
 }
 
