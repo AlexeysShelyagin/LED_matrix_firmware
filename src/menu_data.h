@@ -9,7 +9,6 @@
 #define PARAM 3
 
 namespace menu{
-
     static uint8_t menu_n = 6;
 
     static String menu_list[] = {
@@ -33,6 +32,7 @@ namespace menu{
         "Color HSV",
         "Color RGB",
         "Color by ID",
+        "Current RGB",
 
         "One-color strobe",
         "Multi-color strobe",
@@ -42,13 +42,13 @@ namespace menu{
         "Colors"
     };
 
-    static uint8_t menu_sizes[] = {5, 2, 5, 5, 3, 2};
+    static uint8_t menu_sizes[] = {5, 2, 5, 6, 3, 2};
 
     static uint8_t menu_linking[] = {
         1, 11, 12, 2, 9,
         3, 4,
         5, 4, 5, 6, 7,
-        0, 1, 2, 3, 16,
+        0, 1, 2, 3, 16, 17,
         10, 14, 15,
         8, 13
     };
@@ -57,14 +57,19 @@ namespace menu{
         MENU, FUNC, FUNC, MENU, FUNC,
         MENU, MENU,
         MENU, PARAM, PARAM, PARAM, PARAM,
-        FUNC, FUNC, FUNC, FUNC, FUNC,
+        FUNC, FUNC, FUNC, FUNC, FUNC, FUNC,
         FUNC, FUNC, FUNC,
         FUNC, FUNC
     };
 
+    static uint8_t home_func_id = 18;
 }
 
 /*
+home:                                   FUNC_18
+    root        ON/OFF      Run/Stop    temp
+    HSV         RGB         bright.     by ID
+       
 root:                               MENU_0
     Control:                        MENU_1
         Static:                     MENU_3
@@ -72,6 +77,8 @@ root:                               MENU_0
             Temperature:                FUNC_1
             Color HSV:                  FUNC_2
             Color RGB:                  FUNC_3
+            Color by ID:                FUNC_16
+            Current RGB:                FUNC_17
         Dynamic:                    MENU_4
             Strobe:                     FUNC_10
     ON/OFF:                             FUNC_11
@@ -83,7 +90,7 @@ root:                               MENU_0
         Current limit:                  FUNC_4
         Max brightness:                 FUNC_5
         Color calibration:              FUNC_6
-        About:                          FUNC_7
+        Preview color ID:               FUNC_7
     Wi-Fi:                              FUNC_9
 */
 

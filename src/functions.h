@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include "ui.h"
 #include "values.h"
+#include "bitmaps.h"
 
 #define SPIN_SPEED_FACTOR 1.5
 #define SLIDER_H 3
@@ -84,11 +85,13 @@ class Function_container{
     void func1();
     void func2();
     void func3();
+    void func5();
     void func7();
     void func11();
     void func12();
     void func13();
     void func16();
+    void func18();
 
     void page0();
 public:

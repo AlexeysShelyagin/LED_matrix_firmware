@@ -30,6 +30,9 @@
 #define COLOR_DEFINED_MASK_ADDR 0
 #define COLOR_TYPE_MASK_ADDR 4
 #define COLOR_FIRST_VAL_ADDR 8
-#define EEPROM_SIZE 164                 //COLOR_ID_N * 6 + 8
+
+#define EEPROM_SETTINGS_ADDR 164        //COLOR_ID_N * 6 + 8
+
+#define EEPROM_SIZE 168
 
 #endif

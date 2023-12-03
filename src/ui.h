@@ -50,9 +50,15 @@ public:
     void print(String text, int cur_x = 0, int cur_y = 0);
     void print_right(String text, int cur_x = 0, int cur_y = 0);
     void print_fit(String text, int cur_x = 0, int cur_y = 0);
+    void print_centered(String text, bool center_h = false, int cur_y = 0);
+
     void draw_line(int x0, int y0, int x1, int y1, bool inverted = false);
+    
     void draw_rect(int x_, int y_, int w_, int h_, bool inverted = false, bool filled = false);
+    
     void draw_bitmap(int x_, int y_, const uint8_t bitmap[], int w_, int h_, bool inverted = false);
+    void draw_centered_bitmap(const uint8_t bitmap[], int w_, int h_, bool inverted = false);
+    
 };
 
 class Function_event{
@@ -65,6 +71,8 @@ public:
 class UI{
     Display_SSD1306 *display;
     uint8_t current_item = 1, scroll = 1;
+
+    uint8_t home_func_id = -1;
 
     Window menu_window, status_window, function_window;
     bool status_line;
@@ -101,8 +109,9 @@ public:
     bool function_is_running = false;
 
     UI() = default;
-    UI(Menu* default_menu_, Display_SSD1306 *display_, int font_h_, int row_h_, bool status_line_ = false);
-    void init(Menu* default_menu_, Display_SSD1306 *display_, int font_h_, int row_h_, bool status_line_ = false);
+    UI(Menu* default_menu_, Display_SSD1306 *display_, int font_h_, int row_h_, bool status_line_ = false, uint8_t home_func_id_ = -1);
+    void init(Menu* default_menu_, Display_SSD1306 *display_, int font_h_, int row_h_, bool status_line_ = false, uint8_t home_func_id_ = -1);
+    void set_home_function_id(uint8_t home_func_id_);
 
     void render();
 

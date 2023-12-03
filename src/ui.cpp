@@ -42,18 +42,20 @@ Menu* load_menu(String menu_list[], uint8_t menu_sizes[], uint8_t menu_linking[]
     return menus[0];
 }
 
-UI::UI(Menu* default_menu_, Display_SSD1306 *display_, int font_h_, int row_h_, bool status_line_){
+UI::UI(Menu* default_menu_, Display_SSD1306 *display_, int font_h_, int row_h_, bool status_line_, uint8_t home_func_id_){
     init(default_menu_, display_, font_h_, row_h_, status_line_);
 }
 
-void UI::init(Menu* default_menu_, Display_SSD1306 *display_, int font_h_, int row_h_, bool status_line_){
+void UI::init(Menu* default_menu_, Display_SSD1306 *display_, int font_h_, int row_h_, bool status_line_, uint8_t home_func_id_){
     default_menu = default_menu_;
     display = display_;
+
+    home_func_id = home_func_id_;
 
     status_line = status_line_;
     if(status_line){
         status_window = Window(display, 0, 0, display -> width, row_h_, row_h_);
-        menu_window = Window(display, 0, row_h_ + 1, display -> width, display -> height - row_h_, row_h_);
+        menu_window = Window(display, 0, row_h_, display -> width, display -> height - row_h_, row_h_);
     }
     else{
         menu_window = Window(display, 0, 0, display -> width, display -> height, row_h_);
@@ -66,6 +68,10 @@ void UI::init(Menu* default_menu_, Display_SSD1306 *display_, int font_h_, int r
         row_h_
     );
     set_function_containter();
+}
+
+void UI::set_home_function_id(uint8_t home_func_id_){
+    home_func_id = home_func_id_;
 }
 
 void UI::set_function_containter(){
@@ -81,11 +87,12 @@ void UI::render(){
 
     if(current_menu == nullptr)
         render_main_screen();
-    else
+    else{
         render_menu(current_menu);
 
-    if(function_is_running)
-        render_function();
+        if(function_is_running)
+            render_function();
+    }
     
     if(functions -> quit){
         function_is_running = false;
@@ -135,6 +142,22 @@ void UI::render_menu(Menu* menu){
 
 void UI::render_main_screen(){
     display -> clear();
+    
+    render_status_line();
+
+    function_is_running = true;
+    functions -> window = &menu_window;
+
+    functions -> execute(home_func_id);
+    func_event.moved = 0;
+    func_event.selected = 0;
+
+    if(functions -> quit){
+        current_menu = default_menu;
+        current_item = 1;
+        scroll = 1;
+    }
+
 }
 
 void UI::render_status_line(){
@@ -199,10 +222,9 @@ void UI::select(){
         func_event.selected++;
         return;
     }
-    if(current_menu == nullptr){
-        current_menu = default_menu;
+    if(current_menu == nullptr)
         return;
-    }
+    
 
     uint8_t type = current_menu -> items[current_item].type;
     if(type == MENU || type == BACK){
@@ -340,6 +362,15 @@ void Window::print_fit(String text, int cur_x, int cur_y){
     display -> print(text, cur_x + x, cur_y + y);
 }
 
+void Window::print_centered(String text, bool center_h, int cur_y){
+    int text_x = w / 2 - display -> get_text_width(text) / 2;
+    int text_y = cur_y;
+    if(center_h)
+        text_y = h / 2 - display -> get_text_height(text) / 2;
+    
+    display -> print(text, text_x + x, text_y + y);
+}
+
 void Window::draw_border(bool down, bool left, bool up, bool right){
     if(down)
         draw_down_border();
@@ -352,19 +383,19 @@ void Window::draw_border(bool down, bool left, bool up, bool right){
 }
 
 void Window::draw_down_border(){
-    display -> draw_line(x, y + h - 1, x + w, y + h - 1);
+    display -> draw_line(x, y + h - 1, x + w - 1, y + h - 1);
 }
 
 void Window::draw_left_border(){
-    display -> draw_line(x, y, x, y + h);
+    display -> draw_line(x, y, x, y + h - 1);
 }
 
 void Window::draw_up_border(){
-    display -> draw_line(x, y, x + w, y);
+    display -> draw_line(x, y, x + w - 1, y);
 }
 
 void Window::draw_right_border(){
-    display -> draw_line(x + w - 1, y, x + w - 1, y + h);
+    display -> draw_line(x + w - 1, y, x + w - 1, y + h - 1);
 }
 
 void Window::draw_line(int x0, int y0, int x1, int y1, bool inverted){
@@ -377,4 +408,8 @@ void Window::draw_rect(int x_, int y_, int w_, int h_, bool inverted, bool fille
 
 void Window::draw_bitmap(int x_, int y_, const uint8_t bitmap[], int w_, int h_, bool inverted){
     display -> draw_bitmap(x + x_, y + y_, bitmap, w_, h_, inverted);
+}
+
+void Window::draw_centered_bitmap(const uint8_t bitmap[], int w_, int h_, bool inverted){
+    display -> draw_bitmap(x + w / 2 - w_ / 2, y + h / 2 - h_ / 2, bitmap, w_, h_, inverted);
 }

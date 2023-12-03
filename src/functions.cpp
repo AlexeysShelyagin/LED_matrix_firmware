@@ -247,6 +247,9 @@ void Function_container::execute(int index){
     case 3:
         func3();
         break;
+    case 5:
+        func5();
+        break;
     case 7:
         func7();
         break;
@@ -261,6 +264,9 @@ void Function_container::execute(int index){
         break;
     case 16:
         func16();
+        break;
+    case 18:
+        func18();
         break;
     default:
         Serial.println("Function with index " + String(index) + " not found");
@@ -341,11 +347,11 @@ void Function_container::color_ids_template(){
 }
 
 void Function_container::func0(){
-    single_spin_template < int > ("Bright",&(values -> brightness), 0, 255, window -> w / 2 - 20, 1, 1);
+    single_spin_template < uint16_t > ("Bright", &(values -> brightness), 0, values -> max_brightness, window -> w / 2 - 20, 1, 1);
 }
 
 void Function_container::func1(){
-    single_spin_template < int > ("Temp",&(values -> temperature), 0, 60000, 1, 1, 0, 100);
+    single_spin_template < int > ("Temp", &(values -> temperature), 0, 60000, 1, 1, 0, 100);
 
     values -> current_mode = 3;
 }
@@ -364,12 +370,23 @@ void Function_container::func3(){
     values -> current_mode = 2;
 }
 
+void Function_container::func5(){
+    single_spin_template < uint16_t > ("Max. Bright", &(values -> max_brightness), 0, 255, window -> w / 2 - 20, 1, 1);
+
+    if(quit){
+        values -> save();
+        values -> brightness = min(values -> brightness, values -> max_brightness);
+    }
+}
+
 void Function_container::func7(){
     selected = (values -> color_memory_preview) ? 1 : 0;
     String states[] = {"OFF", "ON"};
     list_spin_template(states, 2);
 
     values -> color_memory_preview = (selected == 0) ? false : true;
+    if(quit)
+        values -> save();
 }
 
 void Function_container::func11(){
@@ -414,31 +431,89 @@ void Function_container::func13(){
 }
 
 void Function_container::func16(){
-    if(event -> selected){
-        if(selected != 26){
-            char id = selected + 'A';
-            if(values -> color_container.type(id)){
-                Color_container::HSV_color col = values -> color_container.get_hsv_by_id(id);
-                values -> hue = col.h;
-                values -> saturation = col.s;
-                values -> visibility = col.v;
+    if(selected != 26){
+        char id = selected + 'A';
+        if(values -> color_container.type(id)){
+            Color_container::HSV_color col = values -> color_container.get_hsv_by_id(id);
+            values -> hue = col.h;
+            values -> saturation = col.s;
+            values -> visibility = col.v;
 
-                values -> current_mode = 1;
-            }
-            else{
-                Color_container::RGB_color col = values -> color_container.get_rgb_by_id(id);
-                values -> red = col.r;
-                values -> green = col.g;
-                values -> blue = col.b;
-
-                values -> current_mode = 2;
-            }
+            values -> current_mode = 1;
         }
-        else
-            quit = true;
+        else{
+            Color_container::RGB_color col = values -> color_container.get_rgb_by_id(id);
+            values -> red = col.r;
+            values -> green = col.g;
+            values -> blue = col.b;
+
+            values -> current_mode = 2;
+        }
     }
+    
+    if(event -> selected)
+        quit = true;
 
     color_ids_template();
+}
+
+void Function_container::func18(){
+    uint8_t home_linking[] = {0, 11, 12, 1, 2, 3, 0, 16};
+
+    if(page != nullptr){
+        window -> clear();
+
+        page -> execute(home_linking[selected]);
+
+        if(page -> quit){
+            delete page;
+            page = nullptr;
+        }
+        return;
+    }
+
+    if(event -> moved){
+        int select_tmp = selected + event -> moved;
+        if(select_tmp < 0)
+            selected = 7;
+        else if(select_tmp > 7)
+            selected = 0;
+        else
+            selected = select_tmp;
+    }
+
+    if(event -> selected){
+        if(selected != 0){
+            page = new Function_container();
+            page -> window = window;
+            page -> event = event;
+        }
+        else{
+            quit = true;
+        }
+    }
+
+    Window buttons[8];
+
+    int button_w = window -> w / 4;
+    int button_h = window -> h / 2;
+    for(int i = 0; i < 2; i++){
+        for(int j = 0; j < 4; j++){
+            buttons[i * 4 + j] = Window(window -> display, window -> x + button_w * j, window -> y + button_h * i - 1, button_w, button_h);
+
+            if(i * 4 + j == selected)
+                buttons[i * 4 + j].draw_border();
+        }
+    }
+
+    buttons[0].draw_centered_bitmap(bitmap_folder_menu_large, 22, 22);
+    buttons[1].print_centered("ON", true);
+    buttons[2].draw_centered_bitmap(bitmap_pause_large, 22, 22);
+    buttons[3].print_centered("K", true);
+    buttons[4].print_centered("HSV", true);
+    buttons[5].print_centered("RGB", true);
+    buttons[6].draw_centered_bitmap(bitmap_brightness_large, 22, 22);
+    buttons[7].print_centered("ID", true);
 }
 
 void Function_container::page0(){

@@ -6,7 +6,7 @@
 
 class Values{
 public:
-    int brightness = 100;
+    uint16_t brightness = 100;
     bool enabled = true, paused = false;
 
     uint8_t current_mode = 0;
@@ -17,9 +17,16 @@ public:
 
     Color_container color_container;
     char current_color_id;
+
+    uint16_t max_brightness = 255;
     bool color_memory_preview = false;
 
     Values() = default;
+
+    void load();
+    void save();
+
+    void clear();
 };
 
 extern Values *values;

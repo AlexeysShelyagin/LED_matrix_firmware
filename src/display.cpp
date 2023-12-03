@@ -32,6 +32,13 @@ int Display_SSD1306::get_text_width(String text){
     return w;
 }
 
+int Display_SSD1306::get_text_height(String text){
+    int16_t  x1, y1;
+    uint16_t w, h;
+    display.getTextBounds(text, 0, 0, &x1, &y1, &w, &h);
+    return h;
+}
+
 void Display_SSD1306::print(String text, int cur_x, int cur_y){
     display.setCursor(cur_x, cur_y);
     display.print(text);

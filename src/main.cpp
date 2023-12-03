@@ -71,7 +71,7 @@ void update_status_bar(){
             status = "RGB";
             break;
         case 3:
-            status = "temp";
+            status = "T:" + String(values -> temperature) + "K";
             break;
         default:
             break;
@@ -103,12 +103,11 @@ void setup() {
 
     ui.init(
         load_menu(menu::menu_list, menu::menu_sizes, menu::menu_linking, menu::menu_types, menu::menu_n),
-        &display, FONT_HEIGHT, ROW_HEIGHT, true
+        &display, FONT_HEIGHT, ROW_HEIGHT, true, menu::home_func_id
     );
     ui.tree();
 
-    //ui.current_menu = ui.default_menu -> items[2].link_menu;
-    ui.current_menu = ui.default_menu;
+    //ui.current_menu = ui.default_menu;
 
     ui.add_icon_bitmap(bitmap_pause, 6, 8);
     ui.add_icon_bitmap(bitmap_stop, 6, 8);
@@ -116,7 +115,7 @@ void setup() {
     ui.add_icon_bitmap(bitmap_battery, 8, 8);
 
     EEPROM.begin(EEPROM_SIZE);
-    values -> color_container.load_init();
+    values -> load();
 
     Serial.println("initialized");
 }

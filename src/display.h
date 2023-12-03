@@ -20,6 +20,7 @@ public:
     void show();
 
     int get_text_width(String text);
+    int get_text_height(String text);
 
     void print(String text, int cur_x = 0, int cur_y = 0);
     void draw_line(int x0, int y0, int x1, int y1, bool inverted = false);
